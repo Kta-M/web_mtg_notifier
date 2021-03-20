@@ -9,6 +9,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+type Client mqtt.Client
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 func Connect(clientId string, endpoint string, rootCAPath string, certPath string, keyPath string) (mqtt.Client, error) {
 	tlsConfig, err := newTLSConfig(rootCAPath, certPath, keyPath)

@@ -80,8 +80,11 @@ func run(c *cli.Context) error {
 	}
 	defer mqtt.Disonnect(client, 250)
 
-	status := false
+	var status bool = webmtg_status.GetStatus()
 	topic := fmt.Sprintf("topic/%v", userName)
+
+	// 初回送信
+	sendStatus(client, topic, status)
 
 	// メインループ
 	for {
@@ -90,13 +93,18 @@ func run(c *cli.Context) error {
 		// log.Printf("cur: %v, old: %v\n", status, oldStatus)
 
 		if status != oldStatus {
-			// log.Printf("publishing %s...\n", topic)
-			message := fmt.Sprintf(`{"status": "%v"}`, status)
-			if err := mqtt.Publish(client, topic, 1, false, message); err != nil {
-				log.Println(err)
-			}
+			sendStatus(client, topic, status)
 		}
 
 		time.Sleep(time.Duration(interval) * time.Second)
+	}
+}
+
+// メッセージ送信
+func sendStatus(client mqtt.Client, topic string, status bool) {
+	message := fmt.Sprintf(`{"status": "%v"}`, status)
+	// log.Printf("publishing %s : %s...\n", topic, message)
+	if err := mqtt.Publish(client, topic, 1, false, message); err != nil {
+		log.Println(err)
 	}
 }
