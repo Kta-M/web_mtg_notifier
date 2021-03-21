@@ -81,7 +81,7 @@ func run(c *cli.Context) error {
 	defer mqtt.Disonnect(client, 250)
 
 	var status bool = webmtg_status.GetStatus()
-	topic := fmt.Sprintf("topic/%v", userName)
+	topic := fmt.Sprintf("webmtg-status/%v", userName)
 
 	// 初回送信
 	sendStatus(client, topic, status)
