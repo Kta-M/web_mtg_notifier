@@ -104,7 +104,7 @@ func run(c *cli.Context) error {
 func sendStatus(client mqtt.Client, topic string, status bool) {
 	message := fmt.Sprintf(`{"status": "%v"}`, status)
 	// log.Printf("publishing %s : %s...\n", topic, message)
-	if err := mqtt.Publish(client, topic, 1, false, message); err != nil {
+	if err := mqtt.Publish(client, topic, 0, false, message); err != nil {
 		log.Println(err)
 	}
 }
