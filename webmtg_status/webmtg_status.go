@@ -14,9 +14,9 @@ func GetStatus() bool {
 }
 
 func getStatusByTools(toolNames []string, useFilter bool) bool {
-	cmdstr := "lsof -iUDP"
+	cmdstr := "lsof -iUDP | grep"
 	for _, name := range toolNames {
-		cmdstr += fmt.Sprintf(" | grep -e %s", name)
+		cmdstr += fmt.Sprintf(" -e %s", name)
 	}
 	if useFilter {
 		cmdstr += " | grep -E 192\\.168\\.0\\.5:\\[0-9]+$"
@@ -28,6 +28,7 @@ func getStatusByTools(toolNames []string, useFilter bool) bool {
 		log.Println(err)
 		return false
 	}
+
 	num, _ := strconv.Atoi(strings.TrimSpace(string(out)))
 
 	return num > 0
