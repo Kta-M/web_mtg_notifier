@@ -9,19 +9,20 @@ import (
 )
 
 func GetStatus() bool {
-	return getStatusByTools([]string{"Slack", "zoom\\.us", "Microsoft", "Google"}, true) ||
-		getStatusByTools([]string{"Discord"}, false)
+	return getStatusByTools([]string{"Slack", "zoom\\.us", "Microsoft", "Google"}, "grep -E 192\\.168\\.0\\.[0-9]+:[0-9]+$") ||
+		getStatusByTools([]string{"Slack"}, "grep -E 10\\.0\\.0\\.[0-9]+:[0-9]+$") ||
+		getStatusByTools([]string{"Discord"}, "grep -E '\\*:[0-9]+$'")
 }
 
-func getStatusByTools(toolNames []string, useFilter bool) bool {
+func getStatusByTools(toolNames []string, optionalGrep string) bool {
 	cmdstr := "lsof -iUDP | grep"
 	for _, name := range toolNames {
 		cmdstr += fmt.Sprintf(" -e %s", name)
 	}
-	if useFilter {
-		cmdstr += " | grep -E 192\\.168\\.0\\.5:\\[0-9]+$"
-	}
+	cmdstr += " | "
+	cmdstr += optionalGrep
 	cmdstr += " | wc -l"
+	fmt.Println(cmdstr)
 
 	out, err := exec.Command("sh", "-c", cmdstr).Output()
 	if err != nil {

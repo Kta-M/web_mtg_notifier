@@ -87,13 +87,20 @@ func run(c *cli.Context) error {
 	sendStatus(client, topic, status)
 
 	// メインループ
+	history := []bool{false, false, false}
 	for {
-		oldStatus := status
 		status = webmtg_status.GetStatus()
-		// log.Printf("cur: %v, old: %v\n", status, oldStatus)
+		log.Printf("status: %v\n", status)
 
-		if status != oldStatus {
-			sendStatus(client, topic, status)
+		history = append([]bool{status}, history[:2]...)
+		log.Printf("history: %v\n", history)
+
+		if history[0] && history[1] && !history[2] {
+			// 2連続trueでtrueを送信
+			sendStatus(client, topic, true)
+		} else if !history[0] && history[1] && history[2] {
+			// falseになれば即falseを送信
+			sendStatus(client, topic, false)
 		}
 
 		time.Sleep(time.Duration(interval) * time.Second)
@@ -103,7 +110,7 @@ func run(c *cli.Context) error {
 // メッセージ送信
 func sendStatus(client mqtt.Client, topic string, status bool) {
 	message := fmt.Sprintf(`{"status": "%v"}`, status)
-	// log.Printf("publishing %s : %s...\n", topic, message)
+	log.Printf("publishing %s : %s...\n", topic, message)
 	if err := mqtt.Publish(client, topic, 0, false, message); err != nil {
 		log.Println(err)
 	}
