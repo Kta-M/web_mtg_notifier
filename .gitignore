@@ -16,3 +16,5 @@
 
 certificates/
 web-mtg_notifier
+subscriber/secret.h
+subscriber/.vscode/
